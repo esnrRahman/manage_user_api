@@ -1,8 +1,7 @@
-#!flask/bin/python
+#!/usr/bin/env python
 
 from models import User
 from db import session
-from app import app
 
 from flask import Flask
 from flask.ext.restful import Api
@@ -28,22 +27,24 @@ group_fields = {
 }
 
 parser = reqparse.RequestParser()
-parser.add_argument('user', type=str)
+parser.add_argument('name', type=str)
+parser.add_argument('email', type=str)
 
 
-class User(Resource):
+class AddUserResource(Resource):
     @marshal_with(user_fields)
-    @app.route('/user/api/v1.0/users/<int:user_id>', methods=['POST'])
-    def add_user(self):
+    def post(self):
         parsed_args = parser.parse_args()
         user = User(name=parsed_args['name'], email=parsed_args['email'])
         session.add(user)
         session.commit()
         return user, 201
 
+
+class GetUsersResource(Resource):
     @marshal_with(user_fields)
-    @app.route('/user/api/v1.0/users', methods=['GET'])
-    def get_users(self):
+    def get(self):
         users = session.query(User).all()
         return users
+
 
