@@ -1,6 +1,4 @@
-#!flask/bin/python
-
-from app import db
+#!/usr/bin/env python
 
 from sqlalchemy import Column
 from sqlalchemy import Integer
@@ -15,17 +13,17 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(64), index=True, unique=True)
-    email = Column(String(120), index=True, unique=True)
+    name = Column(String(64))
+    email = Column(String(120))
 
     def __repr__(self):
         return '<User %r>' % self.name
 
-class Group(db.Model):
+class Group(Base):
     __tablename__ = 'groups'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(64), index=True, unique=True)
+    name = Column(String(64))
     date_created = Column(DateTime, default=datetime.utcnow)
 
     def __repr__(self):
@@ -34,7 +32,7 @@ class Group(db.Model):
 
 if __name__ == "__main__":
     from sqlalchemy import create_engine
-    from settings import DB_URI
-    engine = create_engine(DB_URI)
+    from config import SQLALCHEMY_DATABASE_URI
+    engine = create_engine(SQLALCHEMY_DATABASE_URI)
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)

@@ -1,8 +1,7 @@
-#!flask/bin/python
+#!/usr/bin/env python
 
 from models import User
 from db import session
-from app import app
 
 from flask import Flask
 from flask.ext.restful import Api
@@ -31,10 +30,10 @@ parser = reqparse.RequestParser()
 parser.add_argument('user', type=str)
 
 
-class User(Resource):
+class UserResource(Resource):
     @marshal_with(user_fields)
-    @app.route('/user/api/v1.0/users/<int:user_id>', methods=['POST'])
     def add_user(self):
+        # import pdb; pdb.set_trace()
         parsed_args = parser.parse_args()
         user = User(name=parsed_args['name'], email=parsed_args['email'])
         session.add(user)
@@ -42,8 +41,8 @@ class User(Resource):
         return user, 201
 
     @marshal_with(user_fields)
-    @app.route('/user/api/v1.0/users', methods=['GET'])
-    def get_users(self):
+    def get(self):
+        # import pdb; pdb.set_trace()
         users = session.query(User).all()
         return users
 
