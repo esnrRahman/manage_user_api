@@ -27,22 +27,24 @@ group_fields = {
 }
 
 parser = reqparse.RequestParser()
-parser.add_argument('user', type=str)
+parser.add_argument('name', type=str)
+parser.add_argument('email', type=str)
 
 
-class UserResource(Resource):
+class AddUserResource(Resource):
     @marshal_with(user_fields)
-    def add_user(self):
-        # import pdb; pdb.set_trace()
+    def post(self):
         parsed_args = parser.parse_args()
         user = User(name=parsed_args['name'], email=parsed_args['email'])
         session.add(user)
         session.commit()
         return user, 201
 
+
+class GetUsersResource(Resource):
     @marshal_with(user_fields)
     def get(self):
-        # import pdb; pdb.set_trace()
         users = session.query(User).all()
         return users
+
 
