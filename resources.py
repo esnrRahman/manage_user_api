@@ -29,6 +29,7 @@ parser = reqparse.RequestParser()
 parser.add_argument('name', type=str)
 parser.add_argument('email', type=str)
 
+
 class UserResource(Resource):
     @marshal_with(user_fields)
     def post(self):
@@ -40,8 +41,7 @@ class UserResource(Resource):
 
     @marshal_with(user_fields)
     def get(self):
-        users = session.query(User).all()
-        users.sort(key=lambda user: user.name)
+        users = session.query(User).order_by(User.name).all()
         return users
 
 
@@ -79,8 +79,7 @@ class GroupResource(Resource):
 
     @marshal_with(group_fields)
     def get(self):
-        groups = session.query(Group).all()
-        groups.sort(key=lambda group: group.name)
+        groups = session.query(Group).order_by(Group.name).all()
         return groups
 
 
@@ -139,3 +138,29 @@ class GetGroupsFromUserResource(Resource):
     def get(self, user_id):
         groups = User.query.filter(User.id == user_id).first().groups
         return groups, 201
+
+
+class ListUsersWithGroupCountResource(Resource):
+    def get(self):
+        users = session.query(User).all()
+        allUsers = {}
+        for user in users:
+            count = 0
+            for group in user.groups:
+                count += 1
+            allUsers[user.name] = count
+        allUsers = sorted(allUsers.iteritems(), key=lambda (k, v): (v, k))
+        return allUsers, 201
+
+
+class ListGroupsWithUserCountResource(Resource):
+    def get(self):
+        groups = session.query(Group).all()
+        allGroups = {}
+        for group in groups:
+            count = 0
+            for users in group.users:
+                count += 1
+            allGroups[group.name] = count
+        allGroups = sorted(allGroups.iteritems(), key=lambda (k, v): (v, k))
+        return allGroups, 201
