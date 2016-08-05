@@ -124,3 +124,11 @@ class AddUserToGroupResource(Resource):
     def get(self, user_id, group_id):
         user = Group.query.filter(Group.id == group_id).first().users
         return user, 201
+
+    @marshal_with(user_fields)
+    def delete(self, user_id, group_id):
+        user = session.query(User).filter(User.id == user_id).first()
+        group = session.query(Group).filter(Group.id == group_id).first()
+        user.groups.remove(group)
+        session.commit()
+        return 201
