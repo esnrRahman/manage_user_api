@@ -3,9 +3,6 @@
 from models import User, Group
 from db import session
 
-from flask import Flask
-from flask.ext.restful import Api
-
 from flask.ext.restful import reqparse
 from flask.ext.restful import abort
 from flask.ext.restful import Resource
@@ -111,7 +108,7 @@ class EditGroupResource(Resource):
         return group, 201
 
 
-class AddUserToGroupResource(Resource):
+class UserToGroupResource(Resource):
     def post(self, user_id, group_id):
         user = session.query(User).filter(User.id == user_id).first()
         group = session.query(Group).filter(Group.id == group_id).first()
@@ -121,14 +118,24 @@ class AddUserToGroupResource(Resource):
         return 201
 
     @marshal_with(user_fields)
-    def get(self, user_id, group_id):
-        user = Group.query.filter(Group.id == group_id).first().users
-        return user, 201
-
-    @marshal_with(user_fields)
     def delete(self, user_id, group_id):
         user = session.query(User).filter(User.id == user_id).first()
         group = session.query(Group).filter(Group.id == group_id).first()
+        group.users.remove(user)
         user.groups.remove(group)
         session.commit()
         return 201
+
+
+class GetUsersFromGroupResource(Resource):
+    @marshal_with(user_fields)
+    def get(self, group_id):
+        users = Group.query.filter(Group.id == group_id).first().users
+        return users, 201
+
+
+class GetGroupsFromUserResource(Resource):
+    @marshal_with(group_fields)
+    def get(self, user_id):
+        groups = User.query.filter(User.id == user_id).first().groups
+        return groups, 201
