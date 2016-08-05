@@ -4,10 +4,19 @@ from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import DateTime
+from sqlalchemy import ForeignKey
+from sqlalchemy import Table
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
+from db import session
+
 Base = declarative_base()
+Base.query = session.query_property()
+
+association_table = Table('association', Base.metadata, Column('group_id', Integer, ForeignKey('groups.id')),
+                    Column('user_id', Integer, ForeignKey('users.id')))
 
 class User(Base):
     __tablename__ = 'users'
@@ -15,9 +24,11 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(64))
     email = Column(String(120))
+    groups = relationship("Group", secondary=association_table, back_populates="users")
 
     def __repr__(self):
         return '<User %r>' % self.name
+
 
 class Group(Base):
     __tablename__ = 'groups'
@@ -25,6 +36,7 @@ class Group(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(64))
     date_created = Column(DateTime, default=datetime.utcnow)
+    users = relationship("User", secondary=association_table, back_populates="groups")
 
     def __repr__(self):
         return '<Post %r>' % self.date_created

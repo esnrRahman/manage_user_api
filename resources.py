@@ -80,7 +80,7 @@ class GroupResource(Resource):
         session.commit()
         return group, 201
 
-    @marshal_with(user_fields)
+    @marshal_with(group_fields)
     def get(self):
         groups = session.query(Group).all()
         groups.sort(key=lambda group: group.name)
@@ -109,3 +109,18 @@ class EditGroupResource(Resource):
         session.delete(group)
         session.commit()
         return group, 201
+
+
+class AddUserToGroupResource(Resource):
+    def post(self, user_id, group_id):
+        user = session.query(User).filter(User.id == user_id).first()
+        group = session.query(Group).filter(Group.id == group_id).first()
+        user.groups.append(group)
+        group.users.append(user)
+        session.commit()
+        return 201
+
+    @marshal_with(user_fields)
+    def get(self, user_id, group_id):
+        user = Group.query.filter(Group.id == group_id).first().users
+        return user, 201
