@@ -3,14 +3,19 @@
 from flask import Flask
 from flask.ext.restful import Api
 
-from resources import AddUserResource
-from resources import GetUsersResource
+from resources import UserResource
+from resources import EditUserResource
+from resources import GroupResource
+from resources import EditGroupResource
 
 app = Flask(__name__)
 api = Api(app)
 
-api.add_resource(GetUsersResource, '/manage/api/v1.0/users', endpoint='get_users')
-api.add_resource(AddUserResource, '/manage/api/v1.0/users/add', endpoint='user')
+api.add_resource(UserResource, '/manage/api/v1.0/users', endpoint='users')
+api.add_resource(EditUserResource, '/manage/api/v1.0/users/<string:id>', endpoint='user')
+api.add_resource(GroupResource, '/manage/api/v1.0/groups', endpoint='groups')
+api.add_resource(EditGroupResource, '/manage/api/v1.0/groups/<string:id>', endpoint='group')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
