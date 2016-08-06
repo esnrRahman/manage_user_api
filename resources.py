@@ -111,7 +111,6 @@ class UserToGroupResource(Resource):
     def post(self, user_id, group_id):
         user = session.query(User).filter(User.id == user_id).first()
         group = session.query(Group).filter(Group.id == group_id).first()
-        user.groups.append(group)
         group.users.append(user)
         session.commit()
         return 201
@@ -120,10 +119,10 @@ class UserToGroupResource(Resource):
     def delete(self, user_id, group_id):
         user = session.query(User).filter(User.id == user_id).first()
         group = session.query(Group).filter(Group.id == group_id).first()
+        import pdb; pdb.set_trace()
         group.users.remove(user)
-        user.groups.remove(group)
         session.commit()
-        return 201
+        return user, 201
 
 
 class GetUsersFromGroupResource(Resource):
@@ -133,34 +132,34 @@ class GetUsersFromGroupResource(Resource):
         return users, 201
 
 
-class GetGroupsFromUserResource(Resource):
-    @marshal_with(group_fields)
-    def get(self, user_id):
-        groups = User.query.filter(User.id == user_id).first().groups
-        return groups, 201
-
-
-class ListUsersWithGroupCountResource(Resource):
-    def get(self):
-        users = session.query(User).all()
-        allUsers = {}
-        for user in users:
-            count = 0
-            for group in user.groups:
-                count += 1
-            allUsers[user.name] = count
-        allUsers = sorted(allUsers.iteritems(), key=lambda (k, v): (v, k))
-        return allUsers, 201
-
-
-class ListGroupsWithUserCountResource(Resource):
-    def get(self):
-        groups = session.query(Group).all()
-        allGroups = {}
-        for group in groups:
-            count = 0
-            for users in group.users:
-                count += 1
-            allGroups[group.name] = count
-        allGroups = sorted(allGroups.iteritems(), key=lambda (k, v): (v, k))
-        return allGroups, 201
+# class GetGroupsFromUserResource(Resource):
+#     @marshal_with(group_fields)
+#     def get(self, user_id):
+#         groups = User.query.filter(User.id == user_id).first().groups
+#         return groups, 201
+#
+#
+# class ListUsersWithGroupCountResource(Resource):
+#     def get(self):
+#         users = session.query(User).all()
+#         allUsers = {}
+#         for user in users:
+#             count = 0
+#             for group in user.groups:
+#                 count += 1
+#             allUsers[user.name] = count
+#         allUsers = sorted(allUsers.iteritems(), key=lambda (k, v): (v, k))
+#         return allUsers, 201
+#
+#
+# class ListGroupsWithUserCountResource(Resource):
+#     def get(self):
+#         groups = session.query(Group).all()
+#         allGroups = {}
+#         for group in groups:
+#             count = 0
+#             for users in group.users:
+#                 count += 1
+#             allGroups[group.name] = count
+#         allGroups = sorted(allGroups.iteritems(), key=lambda (k, v): (v, k))
+#         return allGroups, 201
