@@ -132,11 +132,11 @@ class GetUsersFromGroupResource(Resource):
         return users, 201
 
 
-# class GetGroupsFromUserResource(Resource):
-#     @marshal_with(group_fields)
-#     def get(self, user_id):
-#         groups = User.query.filter(User.id == user_id).first().groups
-#         return groups, 201
+class GetGroupsFromUserResource(Resource):
+    @marshal_with(group_fields)
+    def get(self, user_id):
+        groups = session.query(Group).join(Group.users).filter(User.id == user_id).all()
+        return groups, 201
 #
 #
 # class ListUsersWithGroupCountResource(Resource):
