@@ -1,28 +1,28 @@
 Demo RESTful HTTP API using Flask, Flask-Restful and SQLAlchemy
 ===================
 
-1. Create a virtual environment:
+* Create a virtual environment:
 
-virtualenv [env_name]
+> virtualenv [env_name]
 
-2. activate virtual environemet -
+* activate virtual environemet -
 
-cd [env_name]
-source bin/activate
+> cd [env_name]
+> source bin/activate
 
-3. Install requisite packages:
+* Install requisite packages:
 
 pip install -r requirements.txt
 
-4. Create tables:
+* Create tables:
 
 ./models.py
 
-5. Run service:
+* Run service:
 
 ./app.py
 
-6. API functionalities:
+* API functionalities:
 
 Adding new user ->
 
@@ -83,15 +83,15 @@ List of groups and a number of users belonging to each group - sorted by the num
 ===================================================================================================================
 Notes -
 
-1. Make sure virtualenv tools are installed
+* Make sure virtualenv tools are installed
 
-2. Change IP address if necessary in all the URL queries
+* Change IP address if necessary in all the URL queries
 
-3. test.sh is given to put data in your database. Currently pushes three users and groups to the database. 
+* test.sh is given to put data in your database. Currently pushes three users and groups to the database. 
 User #2 is in Group #2. User #3 is in Group #2 and Group #3
 
-4. Make sure "Content-Type: application/json"
+* Make sure "Content-Type: application/json"
 
-5. To deactivate virtual environment -
+* To deactivate virtual environment -
 
 > deactivate
