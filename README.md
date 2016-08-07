@@ -5,12 +5,11 @@ Demo RESTful HTTP API using Flask, Flask-Restful and SQLAlchemy
 
 > virtualenv [env_name]
 
-* activate virtual environemet -
+* Get into the virtual environment (cd [env_name])  and then activate virtual environemet -
 
-> cd [env_name]
 > source bin/activate
 
-* Install requisite packages:
+* Clone the repo and then install requisite packages:
 
 pip install -r requirements.txt
 
