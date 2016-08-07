@@ -168,6 +168,10 @@ class UserToGroupResource(Resource):
 class GetUsersFromGroupResource(Resource):
     @marshal_with(user_fields)
     def get(self, group_id):
+        group = Group.query.filter(Group.id == group_id).first()
+        if not group:
+            abort(404, message="Group {} doesn't exist".format(group_id))
+
         users = Group.query.filter(Group.id == group_id).first().users
         return users, 200
 
@@ -175,6 +179,10 @@ class GetUsersFromGroupResource(Resource):
 class GetGroupsFromUserResource(Resource):
     @marshal_with(group_fields)
     def get(self, user_id):
+        user = session.query(User).filter(User.id == user_id).first()
+        if not user:
+            abort(404, message="User {} doesn't exist".format(user_id))
+
         groups = session.query(Group).join(Group.users).filter(User.id == user_id).all()
         return groups, 200
 
