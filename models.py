@@ -6,7 +6,6 @@ from sqlalchemy import String
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
 from sqlalchemy import Table
-from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
@@ -23,7 +22,7 @@ association_table = Table('association', Base.metadata,
 class User(Base):
     __tablename__ = 'users'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, unique=True, primary_key=True)
     name = Column(String(64))
     email = Column(String(120))
 
@@ -34,7 +33,7 @@ class User(Base):
 class Group(Base):
     __tablename__ = 'groups'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, unique=True, primary_key=True)
     name = Column(String(64))
     date_created = Column(DateTime, default=datetime.utcnow)
     users = relationship("User", secondary=association_table)
