@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
-from models import User, Group
+from models import User, Group, association_table
 from db import session
 
+from sqlalchemy import func
 from flask.ext.restful import reqparse
 from flask.ext.restful import abort
 from flask.ext.restful import Resource
@@ -137,29 +138,17 @@ class GetGroupsFromUserResource(Resource):
     def get(self, user_id):
         groups = session.query(Group).join(Group.users).filter(User.id == user_id).all()
         return groups, 201
-#
-#
-# class ListUsersWithGroupCountResource(Resource):
-#     def get(self):
-#         users = session.query(User).all()
-#         allUsers = {}
-#         for user in users:
-#             count = 0
-#             for group in user.groups:
-#                 count += 1
-#             allUsers[user.name] = count
-#         allUsers = sorted(allUsers.iteritems(), key=lambda (k, v): (v, k))
-#         return allUsers, 201
-#
-#
-# class ListGroupsWithUserCountResource(Resource):
-#     def get(self):
-#         groups = session.query(Group).all()
-#         allGroups = {}
-#         for group in groups:
-#             count = 0
-#             for users in group.users:
-#                 count += 1
-#             allGroups[group.name] = count
-#         allGroups = sorted(allGroups.iteritems(), key=lambda (k, v): (v, k))
-#         return allGroups, 201
+
+
+class ListUsersWithGroupCountResource(Resource):
+    def get(self):
+        allUsers = session.query(User.name, func.count(association_table.c.group_id).label('group_count')). \
+            join(association_table).group_by(User).order_by('group_count ASC').all()
+        return allUsers, 201
+
+
+class ListGroupsWithUserCountResource(Resource):
+    def get(self):
+        allGroups = session.query(Group.name, func.count(association_table.c.user_id).label('user_count')).\
+            join(association_table).group_by(Group).order_by('user_count ASC').all()
+        return allGroups, 201
