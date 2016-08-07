@@ -57,7 +57,7 @@ class UserResource(Resource):
         parsed_args = parser.parse_args()
 
         input_email = parsed_args['email']
-        if check_email_syntax(input_email):
+        if not check_email_syntax(input_email):
             abort(400, message="Email - {} syntax is invalid".format(input_email))
 
         user = User(name=parsed_args['name'], email=input_email)
@@ -80,7 +80,7 @@ class EditUserResource(Resource):
             abort(404, message="User {} doesn't exist".format(id))
 
         input_email = parsed_args['email']
-        if check_email_syntax(input_email):
+        if not check_email_syntax(input_email):
             abort(400, message="Email - {} syntax is invalid".format(input_email))
 
         user.name = parsed_args['name']
