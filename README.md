@@ -65,5 +65,18 @@ Listing all users of a particular group ->
 
 List of users and a number of groups that users belong to - sorted by the number of groups in ascending order ->
 
+>> curl -i http://127.0.0.1:5000/manage/api/v1.0/list/users
+
 List of groups and a number of users belonging to each group - sorted by the number of users in descending order ->
 
+>> curl -i http://127.0.0.1:5000/manage/api/v1.0/list/groups
+
+===================================================================================================================
+Notes -
+
+1. Change IP address if necessary in all the URL queries
+
+2. test.sh is given to put data in your database. Currently pushes three users and groups to the database. 
+User #2 is in Group #2. User #3 is in Group #2 and Group #3
+
+3. Make sure "Content-Type: application/json"
