@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
-from models import User, Group
+from models import User, Group, association_table
 from db import session
+from flask import jsonify
 
-from flask import Flask
-from flask.ext.restful import Api
+import json
 
+from sqlalchemy import func
 from flask.ext.restful import reqparse
 from flask.ext.restful import abort
 from flask.ext.restful import Resource
@@ -32,6 +33,17 @@ parser = reqparse.RequestParser()
 parser.add_argument('name', type=str)
 parser.add_argument('email', type=str)
 
+
+def createJSON(inputList):
+    resultList = []
+    for i in inputList:
+        dict = {}
+        dict[str(i[0])] = i[1]
+        resultList.append(json.dumps(dict))
+    return resultList
+
+
+
 class UserResource(Resource):
     @marshal_with(user_fields)
     def post(self):
@@ -43,8 +55,7 @@ class UserResource(Resource):
 
     @marshal_with(user_fields)
     def get(self):
-        users = session.query(User).all()
-        users.sort(key=lambda user: user.name)
+        users = session.query(User).order_by(User.name).all()
         return users
 
 
@@ -80,10 +91,9 @@ class GroupResource(Resource):
         session.commit()
         return group, 201
 
-    @marshal_with(user_fields)
+    @marshal_with(group_fields)
     def get(self):
-        groups = session.query(Group).all()
-        groups.sort(key=lambda group: group.name)
+        groups = session.query(Group).order_by(Group.name).all()
         return groups
 
 
@@ -109,3 +119,51 @@ class EditGroupResource(Resource):
         session.delete(group)
         session.commit()
         return group, 201
+
+
+class UserToGroupResource(Resource):
+    def post(self, user_id, group_id):
+        user = session.query(User).filter(User.id == user_id).first()
+        group = session.query(Group).filter(Group.id == group_id).first()
+        group.users.append(user)
+        session.commit()
+        return 201
+
+    @marshal_with(user_fields)
+    def delete(self, user_id, group_id):
+        user = session.query(User).filter(User.id == user_id).first()
+        group = session.query(Group).filter(Group.id == group_id).first()
+        import pdb; pdb.set_trace()
+        group.users.remove(user)
+        session.commit()
+        return user, 201
+
+
+class GetUsersFromGroupResource(Resource):
+    @marshal_with(user_fields)
+    def get(self, group_id):
+        users = Group.query.filter(Group.id == group_id).first().users
+        return users, 201
+
+
+class GetGroupsFromUserResource(Resource):
+    @marshal_with(group_fields)
+    def get(self, user_id):
+        groups = session.query(Group).join(Group.users).filter(User.id == user_id).all()
+        return groups, 201
+
+
+class ListUsersWithGroupCountResource(Resource):
+    def get(self):
+        allUsers = session.query(User.name, func.count(association_table.c.group_id).label('group_count')). \
+            join(association_table).group_by(User).order_by('group_count ASC').all()
+        resultList = createJSON(allUsers)
+        return resultList, 201
+
+
+class ListGroupsWithUserCountResource(Resource):
+    def get(self):
+        allGroups = session.query(Group.name, func.count(association_table.c.user_id).label('user_count')).\
+            join(association_table).group_by(Group).order_by('user_count ASC').all()
+        resultList = createJSON(allGroups)
+        return resultList, 201
