@@ -75,14 +75,13 @@ class EditUserResource(Resource):
     @marshal_with(user_fields)
     def put(self, id):
         parsed_args = parser.parse_args()
-        user = session.query(User).filter(User.id == id).first()
-        if not user:
-            abort(404, message="User {} doesn't exist".format(id))
-
         input_email = parsed_args['email']
         if not check_email_syntax(input_email):
             abort(400, message="Email - {} syntax is invalid".format(input_email))
 
+        user = session.query(User).filter(User.id == id).first()
+        if not user:
+            abort(404, message="User {} doesn't exist".format(id))
         user.name = parsed_args['name']
         user.email = parsed_args['email']
         session.add(user)
